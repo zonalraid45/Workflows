@@ -90,7 +90,7 @@ jobs:
       - name: Make Stockfish Executable      
         run: |      
           chmod +x Myshirt/engines/stockfish || true      
-          chmod +x Myshirt/engines/fairy-stockfish_x86-64-bmi2 || true      
+          chmod +x Myshirt/engines/fsf || true     
 
       - name: Install GitHub CLI      
         run: |      
