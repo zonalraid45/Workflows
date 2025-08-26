@@ -1,4 +1,4 @@
-name: Sync Syzygy (LFS) from Mypant → Myshirt
+name: Sync Syzygy (no LFS) from Mypant → Myshirt
 
 on:
   workflow_dispatch: # Manual run
@@ -10,19 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install Git LFS
-        run: |
-          echo "Installing Git LFS..."
-          sudo apt-get update
-          sudo apt-get install git-lfs -y
-          git lfs install
-
       - name: Clone Myshirt (private repo)
         run: |
           echo "Cloning Myshirt..."
           git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/Myshirt.git Myshirt
           cd Myshirt
-          git lfs install
+          # Make sure we disable LFS completely
+          git lfs uninstall || true
+          # Remove any old tracking rule
+          sed -i '/syzygy/d' .gitattributes || true
 
       - name: Clone Mypant repo
         run: |
@@ -37,15 +33,16 @@ jobs:
           cp -r Mypant/engines/syzygy Myshirt/syzygy
           ls -la Myshirt/syzygy
 
-      - name: Commit & Push syzygy (via Git LFS)
+      - name: Commit & Push syzygy (normal Git files)
         run: |
           cd Myshirt
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git lfs track "syzygy/**"
-          git add .gitattributes
-          git add syzygy
+          # Make sure syzygy is not tracked with LFS
+          git lfs untrack "syzygy/**" || true
+          git add .gitattributes || true
 
-          git commit -m "Add/Update syzygy folder from Mypant (LFS)" || echo "No changes to commit"
+          git add syzygy
+          git commit -m "Add/Update syzygy folder from Mypant (normal Git files)" || echo "No changes to commit"
           git push origin main
