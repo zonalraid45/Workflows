@@ -1,0 +1,39 @@
+name: Update Book3.bin in Myshirt
+
+on:
+  workflow_dispatch:  # manual run only
+
+jobs:
+  update-book:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout workflow repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Clone target repo (Myshirt)
+        run: |
+          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/Myshirt.git
+          cd Myshirt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Download Book3.bin from source repo
+        run: |
+          curl -L \
+            -o Myshirt/books/Book3.bin \
+            https://raw.githubusercontent.com/Chess75/1stMYBnew/main/engines/Book3.bin
+          ls -lh Myshirt/books/
+
+      - name: Commit and push to Myshirt
+        run: |
+          cd Myshirt
+          git add books/Book3.bin
+          if git diff --cached --quiet; then
+            echo "✅ No changes in Book3.bin"
+          else
+            git commit -m "Update Book3.bin from Chess75/1stMYBnew"
+            git push origin main
+          fi
