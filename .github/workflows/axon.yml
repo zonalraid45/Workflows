@@ -23,7 +23,7 @@ jobs:
         run: python -u convert.py
 
       - name: Upload filtered PGN
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: axon-pgn
           path: axon.pgn
