@@ -1,0 +1,65 @@
+name: Update Stockfish to Latest Build
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-stockfish:
+    name: Download & Push Latest Stockfish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch latest AVX2 build URL
+        run: curl -L -o stockfish.zip "https://abrok.eu/stockfish/latest/linux/stockfish_x64_avx2.zip"
+
+      - name: Unzip Stockfish
+        run: unzip -q stockfish.zip
+
+      - name: Move and rename Stockfish binary
+        run: |
+          BIN_PATH=$(find . -type f -executable -name "stockfish_*_x64_avx2" | head -n 1)
+          if [[ -z "$BIN_PATH" ]]; then
+            echo "❌ Stockfish binary not found!"
+            exit 1
+          fi
+          mkdir -p engines
+          mv "$BIN_PATH" engines/stockfish
+          chmod +x engines/stockfish
+
+      - name: Push to Myshirt repo
+        env:
+          EXO: ${{ secrets.EXO }}
+        run: |
+          echo "📁 engines folder after copy:"
+          ls -l engines || true
+
+          # Initialize a fresh git repo to target Myshirt
+          git init
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
+
+          # Ensure we are on main (adjust if your Myshirt repo uses 'master')
+          git checkout -b main || git checkout main
+
+          # Add/update Stockfish binary
+          git add engines/stockfish
+
+          # Commit only if there are changes
+          if git diff --cached --quiet; then
+            echo "✅ No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: update to latest Stockfish build"
+          git push origin main
