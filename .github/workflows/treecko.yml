@@ -1,9 +1,9 @@
 name: Update Stockfish to Latest Build
 
 on:
-  workflow_dispatch:       # Manual run from GitHub Actions tab
+  workflow_dispatch:       # Manual run
   schedule:
-    - cron: '0 0 * * *'     # Optional: runs daily at midnight UTC
+    - cron: '0 0 * * *'    # Daily at midnight UTC
 
 permissions:
   contents: write
@@ -14,22 +14,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout dummy repo (not used for push)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: true
 
-      - name: Fetch latest AVX2 build URL
-        id: fetch
+      - name: Clone private repo Myshirt
+        env:
+          TOKEN: ${{ secrets.EXO }}
         run: |
+          git clone https://zonalraid45:${TOKEN}@github.com/zonalraid45/Myshirt.git
+
+      - name: Download & Unzip Stockfish
+        env:
+          TOKEN: ${{ secrets.EXO }}
+        run: |
+          cd Myshirt
           curl -L -o stockfish.zip "https://abrok.eu/stockfish/latest/linux/stockfish_x64_avx2.zip"
-          
-      - name: Unzip Stockfish
-        run: unzip -q stockfish.zip
-
-      - name: Move and rename Stockfish binary
-        run: |
+          unzip -q stockfish.zip
+          mkdir -p engines
           BIN_PATH=$(find . -type f -executable -name "stockfish_*_x64_avx2" | head -n 1)
           if [[ -z "$BIN_PATH" ]]; then
             echo "❌ Stockfish binary not found!"
@@ -38,29 +41,17 @@ jobs:
           mv "$BIN_PATH" engines/stockfish
           chmod +x engines/stockfish
 
-      - name: Commit and push if new or changed
+      - name: Commit & Push if changed
         env:
-          EXO: ${{ secrets.EXO }}
+          TOKEN: ${{ secrets.EXO }}
         run: |
+          cd Myshirt
           echo "📁 engines folder after copy:"
           ls -l engines || true
 
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Reset and set correct remote
-          git remote remove origin || true
-          git remote add origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
-
-          # ✅ Debug what remote URL is set
-          echo "🔎 Checking remote config:"
-          git remote -v
-
-          # Ensure correct branch
-          git fetch origin || true
-          git checkout -B main
-
-          # Stage and commit if needed
           git add engines/stockfish
           if git diff --cached --quiet; then
             echo "✅ No changes to commit."
