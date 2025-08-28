@@ -3,13 +3,11 @@ name: Update Stockfish to Latest Build
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'   # Daily at midnight UTC
+    - cron: '0 0 * * *'
 
 jobs:
   update-stockfish:
-    name: Download & Push Latest Stockfish
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout workflow repo
         uses: actions/checkout@v4
@@ -44,22 +42,20 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # ✅ FIX: No trailing slash in repo URL
-          git remote set-url origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
+          # 🔥 Force reset the remote (no trailing slash!)
+          git remote remove origin
+          git remote add origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
 
-          # Make sure we're on the right branch (main or master depending on Myshirt repo)
+          # Ensure correct branch (adjust if repo uses master)
           git fetch origin || true
           git checkout -B main
 
-          # Stage Stockfish binary
           git add engines/stockfish
 
-          # Skip commit if no changes
           if git diff --cached --quiet; then
             echo "✅ No changes to commit."
             exit 0
           fi
 
-          # Commit & push
           git commit -m "chore: update to latest Stockfish build"
           git push origin main
