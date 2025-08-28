@@ -44,10 +44,10 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Repoint origin to Myshirt repo (⚠️ no trailing slash)
+          # ✅ FIX: No trailing slash in repo URL
           git remote set-url origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
 
-          # Make sure we're on the right branch (use 'main' or 'master' depending on Myshirt repo)
+          # Make sure we're on the right branch (main or master depending on Myshirt repo)
           git fetch origin || true
           git checkout -B main
 
