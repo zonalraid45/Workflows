@@ -44,21 +44,22 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Point the remote to your private repo
+          # Repoint origin to Myshirt repo (⚠️ no trailing slash)
           git remote set-url origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
 
-          # Ensure correct branch (adjust to 'master' if needed)
+          # Make sure we're on the right branch (use 'main' or 'master' depending on Myshirt repo)
           git fetch origin || true
           git checkout -B main
 
-          # Add/update Stockfish binary
+          # Stage Stockfish binary
           git add engines/stockfish
 
-          # Commit only if there are changes
+          # Skip commit if no changes
           if git diff --cached --quiet; then
             echo "✅ No changes to commit."
             exit 0
           fi
 
+          # Commit & push
           git commit -m "chore: update to latest Stockfish build"
           git push origin main
