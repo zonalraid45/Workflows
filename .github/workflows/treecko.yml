@@ -3,11 +3,12 @@ name: Update Stockfish to Latest Build
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'   # Daily at midnight UTC
 
 jobs:
   update-stockfish:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout workflow repo
         uses: actions/checkout@v4
@@ -32,8 +33,6 @@ jobs:
           chmod +x engines/stockfish
 
       - name: Push to Myshirt repo
-        env:
-          EXO: ${{ secrets.EXO }}
         run: |
           echo "📁 engines folder after copy:"
           ls -l engines || true
@@ -42,20 +41,22 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 🔥 Force reset the remote (no trailing slash!)
-          git remote remove origin
-          git remote add origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
+          # 🚨 Remove any existing origin and re-add correctly
+          git remote remove origin || true
+          git remote add origin https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/Myshirt.git
 
-          # Ensure correct branch (adjust if repo uses master)
-          git fetch origin || true
+          # Ensure correct branch (adjust if your Myshirt repo uses master)
           git checkout -B main
 
+          # Add Stockfish binary
           git add engines/stockfish
 
+          # Skip commit if no changes
           if git diff --cached --quiet; then
             echo "✅ No changes to commit."
             exit 0
           fi
 
+          # Commit and push (handle empty repo case with -u)
           git commit -m "chore: update to latest Stockfish build"
-          git push origin main
+          git push -u origin main
