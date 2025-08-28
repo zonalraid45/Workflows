@@ -3,10 +3,7 @@ name: Update Stockfish to Latest Build
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
-
-permissions:
-  contents: write
+    - cron: '0 0 * * *'   # Daily at midnight UTC
 
 jobs:
   update-stockfish:
@@ -14,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout workflow repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Fetch latest AVX2 build URL
+      - name: Fetch latest AVX2 build
         run: curl -L -o stockfish.zip "https://abrok.eu/stockfish/latest/linux/stockfish_x64_avx2.zip"
 
       - name: Unzip Stockfish
@@ -43,14 +40,16 @@ jobs:
           echo "📁 engines folder after copy:"
           ls -l engines || true
 
-          # Initialize a fresh git repo to target Myshirt
-          git init
+          # Configure Git identity
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git remote add origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
 
-          # Ensure we are on main (adjust if your Myshirt repo uses 'master')
-          git checkout -b main || git checkout main
+          # Point the remote to your private repo
+          git remote set-url origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
+
+          # Ensure correct branch (adjust to 'master' if needed)
+          git fetch origin || true
+          git checkout -B main
 
           # Add/update Stockfish binary
           git add engines/stockfish
