@@ -1,23 +1,30 @@
 name: Update Stockfish to Latest Build
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:       # Manual run from GitHub Actions tab
   schedule:
-    - cron: '0 0 * * *'   # Daily at midnight UTC
+    - cron: '0 0 * * *'     # Optional: runs daily at midnight UTC
+
+permissions:
+  contents: write
 
 jobs:
   update-stockfish:
+    name: Download & Push Latest Stockfish
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout workflow repo
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: true
 
-      - name: Fetch latest AVX2 build
-        run: curl -L -o stockfish.zip "https://abrok.eu/stockfish/latest/linux/stockfish_x64_avx2.zip"
-
+      - name: Fetch latest AVX2 build URL
+        id: fetch
+        run: |
+          curl -L -o stockfish.zip "https://abrok.eu/stockfish/latest/linux/stockfish_x64_avx2.zip"
+          
       - name: Unzip Stockfish
         run: unzip -q stockfish.zip
 
@@ -28,35 +35,37 @@ jobs:
             echo "❌ Stockfish binary not found!"
             exit 1
           fi
-          mkdir -p engines
           mv "$BIN_PATH" engines/stockfish
           chmod +x engines/stockfish
 
-      - name: Push to Myshirt repo
+      - name: Commit and push if new or changed
+        env:
+          EXO: ${{ secrets.EXO }}
         run: |
           echo "📁 engines folder after copy:"
           ls -l engines || true
 
-          # Configure Git identity
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # 🚨 Remove any existing origin and re-add correctly
+          # Reset and set correct remote
           git remote remove origin || true
-          git remote add origin https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/Myshirt.git
+          git remote add origin https://x-access-token:${EXO}@github.com/zonalraid45/Myshirt.git
 
-          # Ensure correct branch (adjust if your Myshirt repo uses master)
+          # ✅ Debug what remote URL is set
+          echo "🔎 Checking remote config:"
+          git remote -v
+
+          # Ensure correct branch
+          git fetch origin || true
           git checkout -B main
 
-          # Add Stockfish binary
+          # Stage and commit if needed
           git add engines/stockfish
-
-          # Skip commit if no changes
           if git diff --cached --quiet; then
             echo "✅ No changes to commit."
             exit 0
           fi
 
-          # Commit and push (handle empty repo case with -u)
           git commit -m "chore: update to latest Stockfish build"
-          git push -u origin main
+          git push origin main
