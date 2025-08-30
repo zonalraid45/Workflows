@@ -1,0 +1,48 @@
+name: Download & Upload Anti-syzygy to Internet Archive
+
+on:
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  download-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo (with files.txt)
+        uses: actions/checkout@v4
+
+      - name: Prepare Anti-syzygy folder
+        run: |
+          mkdir -p Anti-syzygy
+
+      - name: Download all files from files.txt
+        run: |
+          while IFS= read -r url; do
+            file=$(basename "$url")
+            echo "Downloading $url -> Anti-syzygy/$file"
+            wget -c "$url" -O "Anti-syzygy/$file"
+          done < files.txt
+
+          echo "First 20 downloaded files:"
+          ls -lh Anti-syzygy | head -n 20
+
+      - name: Install Internet Archive CLI
+        run: |
+          pip install internetarchive
+
+      - name: Upload to Internet Archive
+        env:
+          IA_ACCESS_KEY: ${{ secrets.ELO }}
+          IA_SECRET_KEY: ${{ secrets.ELOL }}
+        run: |
+          echo "Uploading Anti-syzygy to Internet Archive..."
+          ia configure "${IA_ACCESS_KEY}" "${IA_SECRET_KEY}"
+          
+          IA_IDENTIFIER="antichess-2-3-4-5-giveaway"
+          
+          ia upload $IA_IDENTIFIER Anti-syzygy/ \
+            --metadata="title:Antichess 2-3-4-5 Giveaway Tablebase" \
+            --metadata="mediatype:data" \
+            --metadata="collection:opensource" \
+            --metadata="description:Full Antichess 2-3-4-5 Giveaway Syzygy tablebase downloaded from lichess.ovh" \
+            --metadata="subject:antichess,tablebase,syzygy,chess"
