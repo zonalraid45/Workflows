@@ -1,0 +1,52 @@
+name: Sync Anti-syzygy (download from lichess) → Myshirt
+
+on:
+  workflow_dispatch: # Manual run
+  # schedule:
+  #   - cron: "0 2 * * *"  # Runs daily at 02:00 UTC
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone Myshirt (private repo)
+        run: |
+          echo "Cloning Myshirt..."
+          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/Myshirt.git Myshirt
+          cd Myshirt
+          # Disable LFS to avoid large file tracking
+          git lfs uninstall || true
+          # Remove any old tracking rule
+          sed -i '/Anti-syzygy/d' .gitattributes || true
+
+      - name: Download Anti-syzygy files
+        run: |
+          echo "Downloading Anti-syzygy files..."
+          mkdir -p Anti-syzygy
+          cd Anti-syzygy
+          wget -r -np -nH --cut-dirs=4 -R "index.html*" \
+            https://tablebase.lichess.ovh/tables/antichess/2-3-4-5-giveaway/
+          cd ..
+
+          ls -lh Anti-syzygy | head -n 20
+
+      - name: Move Anti-syzygy into Myshirt
+        run: |
+          echo "Placing Anti-syzygy into Myshirt..."
+          rm -rf Myshirt/Anti-syzygy || true
+          mv Anti-syzygy Myshirt/Anti-syzygy
+          ls -lh Myshirt/Anti-syzygy | head -n 20
+
+      - name: Commit & Push Anti-syzygy
+        run: |
+          cd Myshirt
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git lfs untrack "Anti-syzygy/**" || true
+          git add .gitattributes || true
+
+          git add Anti-syzygy
+          git commit -m "Update Anti-syzygy tablebase from lichess" || echo "No changes to commit"
+          git push origin main
