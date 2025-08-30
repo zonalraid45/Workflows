@@ -1,4 +1,4 @@
-name: Sync Anti-syzygy (download from lichess) → Myshirt
+name: Sync Anti-syzygy (download from files.txt) → Myshirt
 
 on:
   workflow_dispatch: # Manual run
@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Workflow repo (to access files.txt)
+        uses: actions/checkout@v4
+
       - name: Clone Myshirt (private repo)
         run: |
           echo "Cloning Myshirt..."
@@ -20,19 +23,17 @@ jobs:
           # Remove any old tracking rule
           sed -i '/Anti-syzygy/d' .gitattributes || true
 
-      - name: Download Anti-syzygy files
+      - name: Download Anti-syzygy files from files.txt
         run: |
           echo "Downloading Anti-syzygy files..."
           mkdir -p Anti-syzygy
           cd Anti-syzygy
 
-          # Download only valid tablebase files
-          wget -r -np -nH --cut-dirs=4 -N \
-            -A "*.gtbw,*.gtbz,*.gtbw.md5,*.gtbz.md5" \
-            https://tablebase.lichess.ovh/tables/antichess/2-3-4-5-giveaway/
+          # Use files.txt from Workflow repo root
+          xargs -n 1 wget -c -N < ../files.txt
 
-          echo "First 20 files:"
-          ls -lh | head -n 20
+          echo "Downloaded files:"
+          ls -lh
           cd ..
 
       - name: Move Anti-syzygy into Myshirt
@@ -52,5 +53,5 @@ jobs:
           git add .gitattributes || true
 
           git add Anti-syzygy
-          git commit -m "Update Anti-syzygy tablebase from lichess" || echo "No changes to commit"
+          git commit -m "Update Anti-syzygy tablebase from files.txt" || echo "No changes to commit"
           git push origin main
