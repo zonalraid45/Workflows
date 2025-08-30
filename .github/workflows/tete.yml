@@ -1,0 +1,26 @@
+name: Generate Anti-syzygy files list
+
+on:
+  workflow_dispatch: # run manually
+
+jobs:
+  generate-list:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch directory listing
+        run: |
+          echo "Fetching file list from lichess..."
+          curl -s https://tablebase.lichess.ovh/tables/antichess/2-3-4-5-giveaway/ \
+            | grep -oP '(?<=href=")[^"]+\.(gtbw|gtbz|md5)' \
+            | sed 's|^|https://tablebase.lichess.ovh/tables/antichess/2-3-4-5-giveaway/|' \
+            > files.txt
+          
+          echo "Preview:"
+          head -n 20 files.txt
+
+      - name: Upload files.txt as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: anti-syzygy-files
+          path: files.txt
