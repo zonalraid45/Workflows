@@ -14,15 +14,15 @@ jobs:
           cd lila
           git checkout master
 
-      - name: Setup Node.js
+      - name: Setup Node.js (24.x)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
-      - name: Setup pnpm
+      - name: Setup pnpm (v10)
         uses: pnpm/action-setup@v4
         with:
-          version: 9 # or whichever version lila uses
+          version: 10
 
       - name: Install dependencies
         working-directory: lila
