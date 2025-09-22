@@ -1,0 +1,35 @@
+name: DeepWiki Update (external)
+
+on:
+  workflow_dispatch:   # manual trigger
+  schedule:
+    - cron: "0 3 * * *"   # daily at 03:00 UTC
+
+jobs:
+  update-deepwiki:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone target repo (lila)
+        run: |
+          git clone https://github.com/zonalraid45/lila.git
+          cd lila
+          git checkout master
+
+      - name: Set up Node.js (latest LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies (optional)
+        working-directory: lila
+        run: |
+          npm install || true
+
+      - name: Trigger DeepWiki reindex
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.EXO }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/zonalraid45/lila/dispatches \
+            -d '{"event_type":"deepwiki_reindex"}'
