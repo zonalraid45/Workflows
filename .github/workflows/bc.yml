@@ -14,20 +14,20 @@ jobs:
     steps:
       # Step 1: Clone private repo
       - name: Clone lilaa repo
-        run: |
-          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git
-        shell: bash
+        run: git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git
 
-      # Step 2: Setup Node.js (latest)
+      # Step 2: Setup Node.js (latest LTS)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20'   # Latest Node 20.x LTS
           cache: 'pnpm'
 
-      # Step 3: Enable corepack so pnpm works
-      - name: Enable corepack (pnpm)
-        run: corepack enable
+      # Step 3: Enable corepack and activate latest pnpm
+      - name: Enable corepack and activate pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
 
       # Step 4: Install dependencies
       - name: Install dependencies
@@ -35,14 +35,14 @@ jobs:
           cd lilaa
           pnpm install
 
-      # Step 5: Check formatting
+      # Step 5: Check code formatting
       - name: Check formatting
         run: |
           cd lilaa
           pnpm run check-format
         continue-on-error: true
 
-      # Step 6: Fix formatting if issues found
+      # Step 6: Auto-fix formatting if issues found
       - name: Fix formatting
         if: failure()
         run: |
