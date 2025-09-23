@@ -1,7 +1,7 @@
 name: Clone & Check Format
 
 on:
-  workflow_dispatch:   # Run manually
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -16,7 +16,6 @@ jobs:
       - name: Clone lilaa repo
         run: |
           git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git
-          cd lilaa
         shell: bash
 
       # Step 2: Setup Node.js (latest)
@@ -26,9 +25,9 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      # Step 3: Install pnpm
-      - name: Install pnpm
-        run: npm install -g pnpm
+      # Step 3: Enable corepack so pnpm works
+      - name: Enable corepack (pnpm)
+        run: corepack enable
 
       # Step 4: Install dependencies
       - name: Install dependencies
@@ -36,14 +35,14 @@ jobs:
           cd lilaa
           pnpm install
 
-      # Step 5: Check code formatting
+      # Step 5: Check formatting
       - name: Check formatting
         run: |
           cd lilaa
           pnpm run check-format
         continue-on-error: true
 
-      # Step 6: Auto-fix formatting if issues found
+      # Step 6: Fix formatting if issues found
       - name: Fix formatting
         if: failure()
         run: |
