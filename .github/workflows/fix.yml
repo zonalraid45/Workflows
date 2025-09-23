@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Clone forked repo with EXO token
         run: |
-          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lila.git
+          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git
           cd lila
           git checkout master
 
