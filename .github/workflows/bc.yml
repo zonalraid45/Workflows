@@ -1,37 +1,56 @@
-name: DeepWiki Auto Retry
+name: Clone & Check Format
 
 on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 * * * *"  # every hour
+  workflow_dispatch:   # Run manually
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  retry-deepwiki:
+  clone-and-format:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Clone lila repo
+      # Step 1: Clone private repo
+      - name: Clone lilaa repo
         run: |
-          git clone https://github.com/zonalraid45/lila.git
-          cd lila
-          git checkout master
+          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git
+          cd lilaa
+        shell: bash
 
-      - name: Show latest commit hash
-        working-directory: lila
+      # Step 2: Setup Node.js (latest)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      # Step 3: Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
         run: |
-          echo "Latest commit on master branch:"
-          git rev-parse HEAD
-          echo "Commit message:"
-          git log -1 --pretty=%B
+          cd lilaa
+          pnpm install
 
-      - name: Trigger DeepWiki reindex
+      # Step 5: Check code formatting
+      - name: Check formatting
         run: |
-          LATEST_COMMIT=$(git -C lila rev-parse HEAD)
-          echo "Triggering DeepWiki reindex for commit $LATEST_COMMIT"
-          curl -X POST \
-            -H "Authorization: token ${{ secrets.EXO }}" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/zonalraid45/lila/dispatches \
-            -d '{"event_type":"deepwiki","client_payload":{"commit":"'"$LATEST_COMMIT"'"}}'
+          cd lilaa
+          pnpm run check-format
+        continue-on-error: true
 
-      - name: Notify
-        run: echo "DeepWiki reindex triggered for commit $LATEST_COMMIT. Check https://deepwiki.com/zonalraid45/lila"
+      # Step 6: Auto-fix formatting if issues found
+      - name: Fix formatting
+        if: failure()
+        run: |
+          cd lilaa
+          pnpm prettier --config=ui/.prettierrc.json --write .
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Auto-fix code formatting"
+          git push https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git HEAD:main
