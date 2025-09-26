@@ -75,7 +75,7 @@ jobs:
         run: cd Myshirt && pip install -r requirements.txt        
 
       - name: Inject Secret Token into config.yml        
-        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.LICHESS_KEY }}/g" all.yml        
+        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.M }}/g" all.yml        
 
       - name: Make Stockfish Executable        
         run: |        
@@ -180,7 +180,7 @@ jobs:
         run: cd Myshirt && pip install -r requirements.txt        
 
       - name: Inject Secret Token into config.yml        
-        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.LICHESS_KEY }}/g" all.yml        
+        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.U }}/g" all.yml        
 
       - name: Make Stockfish Executable        
         run: |        
@@ -285,7 +285,7 @@ jobs:
         run: cd Myshirt && pip install -r requirements.txt        
 
       - name: Inject Secret Token into config.yml        
-        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.LICHESS_KEY }}/g" all.yml        
+        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.A }}/g" all.yml        
 
       - name: Make Stockfish Executable        
         run: |        
@@ -390,7 +390,7 @@ jobs:
         run: cd Myshirt && pip install -r requirements.txt        
 
       - name: Inject Secret Token into config.yml        
-        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.LICHESS_KEY }}/g" all.yml        
+        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.E }}/g" all.yml        
 
       - name: Make Stockfish Executable        
         run: |        
@@ -497,7 +497,7 @@ jobs:
         run: cd Myshirt && pip install -r requirements.txt        
 
       - name: Inject Secret Token into config.yml        
-        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.LICHESS_KEY }}/g" all.yml        
+        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.B }}/g" all.yml        
 
       - name: Make Stockfish Executable        
         run: |        
