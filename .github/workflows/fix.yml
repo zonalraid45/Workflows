@@ -25,15 +25,15 @@ jobs:
           version: 10
 
       - name: Install dependencies
-        working-directory: lilaa
+        working-directory: lila
         run: pnpm install --frozen-lockfile
 
       - name: Run Prettier (fix mode)
-        working-directory: lilaa
+        working-directory: lila
         run: pnpm prettier --config=ui/.prettierrc.json --cache --write .
 
       - name: Commit and push changes
-        working-directory: lilaa
+        working-directory: lila
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
