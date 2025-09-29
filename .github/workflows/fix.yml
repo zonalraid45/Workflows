@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Clone forked repo with EXO token
         run: |
-          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lilaa.git
-          cd lilaa
+          git clone https://x-access-token:${{ secrets.EXO }}@github.com/zonalraid45/lila.git
+          cd lila
           git checkout master
 
       - name: Setup Node.js (24.x)
