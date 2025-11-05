@@ -82,7 +82,7 @@ jobs:
           cd Myshirt        
           chmod +x ./engines/stockfish || true        
           chmod +x ./engines/fsf || true        
-
+          chmod +x ./engines/stockfish11 || true 
       - name: Install GitHub CLI        
         run: |        
           type -p gh || (curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg &&        
@@ -187,7 +187,8 @@ jobs:
           cd Myshirt        
           chmod +x ./engines/stockfish || true        
           chmod +x ./engines/fsf || true        
-
+          chmod +x ./engines/stockfish11 || true
+          
       - name: Install GitHub CLI        
         run: |        
           type -p gh || (curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg &&        
@@ -292,7 +293,8 @@ jobs:
           cd Myshirt        
           chmod +x ./engines/stockfish || true        
           chmod +x ./engines/fsf || true        
-
+          chmod +x ./engines/stockfish11 || true
+          
       - name: Install GitHub CLI        
         run: |        
           type -p gh || (curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg &&        
@@ -395,7 +397,8 @@ jobs:
       - name: Make Stockfish Executable        
         run: |        
           cd Myshirt        
-          chmod +x ./engines/stockfish || true        
+          chmod +x ./engines/stockfish || true    
+          chmod +x ./engines/stockfish11 || true
           chmod +x ./engines/fsf || true        
 
       - name: Install GitHub CLI        
@@ -500,7 +503,8 @@ jobs:
       - name: Make Stockfish Executable        
         run: |        
           cd Myshirt        
-          chmod +x ./engines/stockfish || true        
+          chmod +x ./engines/stockfish || true   
+          chmod +x ./engines/stockfish11 || true
           chmod +x ./engines/fsf || true        
 
       - name: Install GitHub CLI        
@@ -607,7 +611,8 @@ jobs:
       - name: Make Stockfish Executable        
         run: |        
           cd Myshirt        
-          chmod +x ./engines/stockfish || true        
+          chmod +x ./engines/stockfish || true      
+          chmod +x ./engines/stockfish11 || true
           chmod +x ./engines/fsf || true        
 
       - name: Install GitHub CLI        
