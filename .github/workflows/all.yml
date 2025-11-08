@@ -652,7 +652,7 @@ jobs:
           STOP_SECONDS="${{ github.event.inputs.stop_seconds }}"        
 
           cd Myshirt        
-          CMD="python3 -u user_interface.py --config all.yml"        
+          CMD="python3 -u user_interface.py --config socks.yml"        
           [ "$UPGRADE" = "true" ] && CMD="$CMD --upgrade"        
           [ "$MATCHMAKING" = "true" ] && CMD="$CMD matchmaking"        
           [ -n "$ADDITIONAL_CMD" ] && CMD="$CMD $ADDITIONAL_CMD"        
