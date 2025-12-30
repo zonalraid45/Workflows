@@ -392,7 +392,7 @@ jobs:
         run: cd Myshirt && pip install -r requirements.txt        
 
       - name: Inject Secret Token into config.yml        
-        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.A }}/g" all.yml        
+        run: cd Myshirt && sed -i "s/TokenTimeIsBackBuddyss/${{ secrets.A }}/g" config.yml        
 
       - name: Make Stockfish Executable        
         run: |        
@@ -438,7 +438,7 @@ jobs:
           STOP_SECONDS="${{ github.event.inputs.stop_seconds }}"        
 
           cd Myshirt        
-          CMD="python3 -u user_interface.py --config all.yml"        
+          CMD="python3 -u user_interface.py --config config.yml"        
           [ "$UPGRADE" = "true" ] && CMD="$CMD --upgrade"        
           [ "$MATCHMAKING" = "true" ] && CMD="$CMD matchmaking"        
           [ -n "$ADDITIONAL_CMD" ] && CMD="$CMD $ADDITIONAL_CMD"        
