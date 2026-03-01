@@ -29,7 +29,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.EXO }}
         run: |
-          cd Myshirt
+          cd Stale
           curl -L -o stockfish.zip "https://abrok.eu/stockfish/latest/linux/stockfish_x64_avx2.zip"
           unzip -q stockfish.zip
           mkdir -p engines
@@ -45,7 +45,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.EXO }}
         run: |
-          cd Myshirt
+          cd Stale
           echo "📁 engines folder after copy:"
           ls -l engines || true
 
