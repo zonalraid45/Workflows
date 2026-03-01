@@ -23,7 +23,7 @@ jobs:
         env:
           TOKEN: ${{ secrets.EXO }}
         run: |
-          git clone https://zonalraid45:${TOKEN}@github.com/zonalraid45/Myshirt.git
+          git clone https://zonalraid45:${TOKEN}@github.com/zonalraid45/Stale.git
 
       - name: Download & Unzip Stockfish
         env:
